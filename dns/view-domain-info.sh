@@ -61,12 +61,12 @@ _get_ip_address() {
 	local DOMAIN=${1}
 	local domainalias=""
 	local ipaddress=""
-	domainalias=$(host -t A "${DOMAIN}" | grep "is\ an\ alias" | awk '{print $6}' | sed 's/.$//')
-	ipaddress=$(host -t A "${DOMAIN}" | grep -v "has\ no" | awk '{print $4}' | sed '/^ *$/d' | tr '\n' ' ' | sed 's/ $//')
+	domainalias=$(host -t A "${DOMAIN}" | grep "is an alias" | awk '{print $6}' | sed 's/.$//')
+	ipaddress=$(host -t A "${DOMAIN}" | grep -v "has no" | awk '{print $4}' | sed '/^ *$/d' | tr '\n' ' ' | sed 's/ $//')
 	#ipaddress=$(dig "${DOMAIN}" +short | tr '\n' ' ' | sed 's/ $//')
 	if [ -n "${domainalias}" ]; then
 		echo -e "Domain:\t\t${DOMAIN} is alias for ${domainalias}"
-		ipaddress=$(host -t A "${domainalias}" | grep -v "has\ no" | awk '{print $4}' | sed '/^ *$/d' | tr '\n' ' ' | sed 's/ $//')
+		ipaddress=$(host -t A "${domainalias}" | grep -v "has no" | awk '{print $4}' | sed '/^ *$/d' | tr '\n' ' ' | sed 's/ $//')
 	else
 		echo -e "Domain:\t\t${DOMAIN}"
 	fi
@@ -84,11 +84,11 @@ _get_nameserver() {
 	local i=1
 	local ns=""
 	#nsservercnt=$(dig ns "${DOMAIN}" | grep -v '^;' | grep NS | awk {'print $5'} | sed '/^$/d' | wc -l)
-	nsservercnt=$(host -t NS ${DOMAIN} | grep -v "has\ no NS" | wc -l)
+	nsservercnt=$(host -t NS ${DOMAIN} | grep -v "has no NS" | wc -l)
 	echo -e "Name Server:\tFound ${nsservercnt} NS record";
 	for ns in $(dig ns "${DOMAIN}" | grep -v '^;' | grep NS | awk {'print $5'} | sed '/^$/d' | sed 's/.$//' | sort); do
 		#ipnsserver=$(getent hosts "${ns}" | awk '{print $1}')
-		ipnsserver=$(host -t A "${ns}" | grep -v "not\ found" | awk '{print $4}' | sed '/^ *$/d' | tr '\n' ' ' | sed 's/ $//')
+		ipnsserver=$(host -t A "${ns}" | grep -v "not found" | awk '{print $4}' | sed '/^ *$/d' | tr '\n' ' ' | sed 's/ $//')
 		if [ -n "${ipnsserver}" ]; then
 			echo -e "Name Server $i:\t${ns} (${ipnsserver})";
 		else
@@ -106,14 +106,14 @@ _get_mail_server() {
 	local mx=""
 	local i=1
 	#mailserver=$(dig mx ${DOMAIN} | grep -v '^;' | grep MX | awk {'print $6'} | sed '/^$/d')
-	mailserver=$(host -t MX "${DOMAIN}" | grep -v "has\ no")
+	mailserver=$(host -t MX "${DOMAIN}" | grep -v "has no")
 	if [ -n "${mailserver}" ]; then
 		#mxservercnt=$(dig mx "${DOMAIN}" | grep -v '^;' | grep MX | awk {'print $6'} | sed '/^$/d' | wc -l)
 		mxservercnt=$(host -t MX "${DOMAIN}" |sort | awk '{print $7}'| sed 's/.$//' | wc -l)
 		echo -e "Mail Server:\tFound ${mxservercnt} MX record";
 		for mx in $(dig mx "${DOMAIN}" | grep -v '^;' | grep MX | awk {'print $6'} | sed '/^$/d' | sed 's/.$//' | sort); do
 			#ipmailserver=$(getent hosts ${mx} | awk '{print $1}')
-			ipmailserver=$(host -t A "${mx}" | grep -v "has\ no" | awk '{print $4}' | sed '/^ *$/d' | tr '\n' ' ' | sed 's/ $//')
+			ipmailserver=$(host -t A "${mx}" | grep -v "has no" | awk '{print $4}' | sed '/^ *$/d' | tr '\n' ' ' | sed 's/ $//')
 			if [ -n "${ipmailserver}" ]; then
 				echo -e "Mail Server ${i}:\t${mx} (${ipmailserver})";
 			else
@@ -142,7 +142,7 @@ _view_domain_info() {
 			exit 1
 		fi
 		_get_ip_address "${DOMAIN}"
-		domainalias=$(host -t A "${DOMAIN}" | grep "is\ an\ alias" | awk '{print $6}' | sed 's/.$//')
+		domainalias=$(host -t A "${DOMAIN}" | grep "is an alias" | awk '{print $6}' | sed 's/.$//')
 		if [ -n "${domainalias}" ]; then
 			_get_nameserver "${domainalias}"
 			_get_mail_server "${domainalias}"
@@ -152,7 +152,7 @@ _view_domain_info() {
 		fi
 	elif [ -n "${nslookupdomain}" ]; then
 		_get_ip_address "${DOMAIN}"
-		domainalias=$(host -t A "${DOMAIN}" | grep "is\ an\ alias" | awk '{print $6}' | sed 's/.$//')
+		domainalias=$(host -t A "${DOMAIN}" | grep "is an alias" | awk '{print $6}' | sed 's/.$//')
 		if [ -n "${domainalias}" ]; then
 			_get_nameserver "${domainalias}"
 			_get_mail_server "${domainalias}"
@@ -162,7 +162,7 @@ _view_domain_info() {
 		fi
 	else
 		echo "Domain '${DOMAIN}' is not registered."
-		exit 1
+		exit 1 
 	fi
 }
 
